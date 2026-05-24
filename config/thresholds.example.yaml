@@ -1,0 +1,53 @@
+# 告警阈值配置模板 — 复制为 thresholds.yaml 后按需编辑
+# Alert threshold template — copy to thresholds.yaml and edit
+#
+# 每个检查项定义 WARNING / CRITICAL 两级阈值
+# Each check defines WARNING and CRITICAL thresholds
+
+disk:
+  mount_points: ["/", "/var/lib/kubelet", "/var/lib/containerd"]
+  space:
+    warning_pct: 80
+    critical_pct: 90
+  inode:
+    warning_pct: 80
+    critical_pct: 90
+  io_latency_ms:
+    warning: 50
+    critical: 100
+
+memory:
+  available:
+    warning_pct: 20
+    critical_pct: 10
+  swap:
+    warning_pct: 10
+    critical_pct: 30
+  oom_window_minutes: 15
+
+conntrack:
+  table_usage:
+    warning_pct: 85
+    critical_pct: 95
+  time_wait_max: 10000
+
+kubelet:
+  pleg_latency_seconds:
+    warning: 2.0
+    critical: 5.0
+  log_scan_window_minutes: 15
+  log_error_patterns:
+    - "error"
+    - "timeout"
+    - "deadline"
+    - "backoff"
+    - "eviction"
+
+kernel:
+  dmesg_critical_patterns:
+    - "BUG:"
+    - "Kernel panic"
+    - "segfault"
+    - "Hardware Error"
+    - "WARNING:"
+  hung_task_timeout: 120

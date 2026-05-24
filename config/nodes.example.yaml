@@ -1,0 +1,55 @@
+# 节点清单配置模板 — 复制为 nodes.yaml 后按需编辑
+# Node inventory template — copy to nodes.yaml and edit
+
+nodes:
+  # 控制平面节点 / Control-plane node
+  - hostname: k8s-master-01
+    ip: 10.0.1.10
+    port: 22
+    username: root
+    key_file: ~/.ssh/id_rsa
+    groups: ["control-plane", "production"]
+    checks:
+      disk: true
+      memory: true
+      conntrack: true
+      kubelet: true
+      kernel: true
+    # k8s_node_name: k8s-master-01  # K8s Node 名称（与 hostname 不同时指定）
+
+  # 工作节点 / Worker node
+  - hostname: k8s-worker-01
+    ip: 10.0.1.21
+    port: 22
+    username: root
+    key_file: ~/.ssh/id_rsa
+    groups: ["worker", "production"]
+    # k8s_node_name: cn-beijing.k8s-worker-01  # ACK/TKE 节点名常与 hostname 不同
+
+  # 使用跳板机的节点（可选）/ Behind a bastion (optional)
+  # - hostname: k8s-worker-02
+  #   ip: 10.0.2.21
+  #   port: 22
+  #   username: root
+  #   key_file: ~/.ssh/id_rsa
+  #   groups: ["worker"]
+  #   bastion:
+  #     hostname: jump-server
+  #     ip: 10.0.0.1
+  #     port: 22
+  #     username: ops
+  #     key_file: ~/.ssh/id_rsa
+
+# 并发 SSH 连接数 / Concurrent SSH connections
+concurrency: 5
+
+# SSH 超时秒数 / SSH timeout in seconds
+ssh_timeout: 15
+
+# 全局检查开关（节点级可覆盖）/ Global check toggles (overridable per-node)
+global_checks:
+  disk: true
+  memory: true
+  conntrack: true
+  kubelet: true
+  kernel: true

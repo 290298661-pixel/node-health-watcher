@@ -1,0 +1,30 @@
+# 告警路由配置模板 — 复制为 alerting.yaml 后按需编辑
+# Alert routing template — copy to alerting.yaml and edit
+
+# 飞书 Webhook / Feishu bot webhook
+feishu:
+  enabled: true
+  webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/your-hook-id"
+  signing_key: ""
+  level_routing:
+    warning: true
+    critical: true
+
+# 钉钉 Webhook / DingTalk bot webhook
+dingtalk:
+  enabled: true
+  webhook_url: "https://oapi.dingtalk.com/robot/send?access_token=your-token"
+  signing_key: ""
+  level_routing:
+    warning: false
+    critical: true
+
+# 分组路由 — 不同节点组可路由至不同 IM 渠道
+# Group routing — different node groups can route to different IM channels
+group_routing:
+  production:
+    feishu: ["warning", "critical"]
+    dingtalk: ["critical"]
+  staging:
+    feishu: ["warning", "critical"]
+    dingtalk: []
