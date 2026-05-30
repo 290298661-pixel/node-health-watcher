@@ -1,0 +1,145 @@
+# Node Health Watcher — Deployment
+# 部署为长期运行的 scheduler + API server
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nhw-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nhw-config
+  namespace: nhw-system
+data:
+  nodes.yaml: |
+    # NHW 节点清单 — kind 开发集群
+    # 注意: kind 节点容器没有 SSH server，巡检模式需要调整为 kubelet-only
+    nodes: []
+    concurrency: 3
+    ssh_timeout: 15
+    global_checks:
+      disk: false
+      memory: false
+      conntrack: false
+      kubelet: true
+      kernel: false
+  thresholds.yaml: |
+    thresholds:
+      disk:
+        space_warning: 80
+        space_critical: 90
+        inode_warning: 80
+        inode_critical: 90
+      memory:
+        available_warning: 10
+        available_critical: 5
+      conntrack:
+        usage_warning: 85
+        usage_critical: 95
+  alerting.yaml: |
+    alerting:
+      enabled: false
+      feishu:
+        webhook_url: ""
+      dingtalk:
+        webhook_url: ""
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-health-watcher
+  namespace: nhw-system
+  labels:
+    app: node-health-watcher
+spec:
+  type: ClusterIP
+  ports:
+    - name: api
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: node-health-watcher
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-health-watcher
+  namespace: nhw-system
+  labels:
+    app: node-health-watcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-health-watcher
+  template:
+    metadata:
+      labels:
+        app: node-health-watcher
+    spec:
+      serviceAccountName: nhw-api
+      containers:
+        - name: api
+          image: ghcr.io/290298661-pixel/node-health-watcher:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --interval=5m
+            - --config-dir=/etc/nhw
+            - --log-format=json
+          ports:
+            - name: api
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nhw
+              readOnly: true
+            - name: ssh-key
+              mountPath: /home/nhw/.ssh
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: config
+          configMap:
+            name: nhw-config
+        - name: ssh-key
+          secret:
+            secretName: nhw-ssh-key
+            optional: true
+            defaultMode: 0600
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nhw-api
+  namespace: nhw-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nhw-reader
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "pods", "events"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nhw-reader-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nhw-reader
+subjects:
+  - kind: ServiceAccount
+    name: nhw-api
+    namespace: nhw-system

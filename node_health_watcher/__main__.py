@@ -66,8 +66,7 @@ def main() -> None:
     config = load_config(config_dir)
 
     if not config.nodes:
-        logger.error("未配置任何节点，请编辑 config/nodes.yaml 后重试")
-        sys.exit(1)
+        logger.warning("未配置任何节点，NHW 将以监控模式运行（仅 API server，不执行 SSH 巡检）")
 
     dedup = DedupStore(state_file=args.state_file)
 
