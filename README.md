@@ -26,7 +26,7 @@
 
 ## 概述
 
-**Node Health Watcher** 定时 SSH 进你的 K8s 节点，跑磁盘、内存、conntrack、kubelet、内核五项巡检，发现有异常就推飞书/钉钉——有状态的去重机制保证同一个问题只告警一次，恢复了还通知你。你不需要半夜起来手动 SSH 进 50 台节点。
+**Node Health Watcher** 定时 SSH 进你的 K8s 节点，进行磁盘、内存、conntrack、kubelet、内核五项巡检，发现有异常就推飞书/钉钉——有状态的去重机制保证了合理通知。
 
 ### 它在工具链中的位置
 
@@ -37,8 +37,6 @@ Node Health Watcher 是 [三部曲](https://github.com/290298661-pixel) 的**第
 | [Node Guardian](https://github.com/290298661-pixel/node-guardian) | Bash | 出了故障怎么排查和修复？ |
 | **Node Health Watcher** ← 你在这里 | Python | 什么时候该去排查？ |
 | [Game Fleet Director](https://github.com/290298661-pixel/game-server-orchestrator) | Go | 谁来操作游戏服本身？ |
-
-**选 Python 是因为** 这一层跑在控制节点上，需要 YAML 配置解析、并发 SSH 多节点、结构化解析输出、构造 JSON 推 IM webhook——每一步都在处理结构化数据，Python 天然适合。paramiko + APScheduler 的组合在百台节点规模内足够用，且文档丰富、企业环境对接方案完备。
 
 ### 核心原则
 
@@ -107,9 +105,9 @@ python -m node_health_watcher --interval 5m
 
 ### 设计决策
 
-**为什么选 paramiko + ThreadPoolExecutor？** 百台节点内 5-10 线程足够——瓶颈在节点命令执行时间而非 SSH 握手。paramiko 是纯 Python 生态中最成熟的 SSH 库，对接跳板机、代理、PKey 方案完备。扩展到 500+ 节点时迁移 asyncssh 成本可控。
+** paramiko + ThreadPoolExecutor ** 百台节点内 5-10 线程足够——瓶颈在节点命令执行时间而非 SSH 握手。paramiko 是纯 Python 生态中最成熟的 SSH 库，对接跳板机、代理、PKey 方案完备。扩展到 500+ 节点时迁移 asyncssh 成本可控。
 
-**为什么选 APScheduler 而不是 Linux cron？** 需要在代码内管理 cron 表达式和告警状态（去重字典）。cron 是进程级别的调度无状态，APScheduler 可以在同进程内直接读写 `DedupStore`，无需借助外部数据库或文件锁。
+** APScheduler 而不是 Linux cron？** 需要在代码内管理 cron 表达式和告警状态（去重字典）。cron 是进程级别的调度无状态，APScheduler 可以在同进程内直接读写 `DedupStore`，无需借助外部数据库或文件锁。
 
 **国内云环境适配** —— kubelet 日志扫描优先 journalctl，自动回退 `/var/log/kubelet.log`（国内云镜像默认关闭 journald 持久化）。SSH 默认 `WarningPolicy` 而非 `AutoAddPolicy`，需显式设置 `NHW_INSECURE_AUTOADD_HOST_KEY` 才放开。
 
