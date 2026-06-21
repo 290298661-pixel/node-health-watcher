@@ -7,6 +7,9 @@ FROM python:3.12-slim
 LABEL org.opencontainers.image.source="https://github.com/290298661-pixel/node-health-watcher"
 LABEL org.opencontainers.image.description="K8s node health inspection & IM alerting toolkit"
 
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
 # 安装 SSH 客户端和构建依赖
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-client \
@@ -25,7 +28,10 @@ RUN pip install --no-cache-dir . && \
     apt-get purge -y gcc && apt-get autoremove -y
 
 # 非 root 运行
-RUN useradd -m -s /bin/bash nhw && chown -R nhw:nhw /app
+RUN useradd -m -u 10001 -s /usr/sbin/nologin nhw \
+    && chown -R nhw:nhw /app \
+    && mkdir -p /tmp \
+    && chown nhw:nhw /tmp
 USER nhw
 
 # 创建 SSH 目录（用于挂载密钥）

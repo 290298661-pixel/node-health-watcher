@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
 import logging
@@ -83,12 +84,8 @@ def _build_recovery_card(recoveries: list[dict]) -> dict:
 
 def _sign(secret: str, timestamp: int) -> str:
     string_to_sign = f"{timestamp}\n{secret}"
-    hmac_code = hmac.new(
-        key=secret.encode("utf-8"),
-        msg=string_to_sign.encode("utf-8"),
-        digestmod=hashlib.sha256,
-    )
-    return hmac_code.digest().hex()
+    hmac_code = hmac.new(string_to_sign.encode("utf-8"), digestmod=hashlib.sha256).digest()
+    return base64.b64encode(hmac_code).decode("utf-8")
 
 
 def send_feishu(
