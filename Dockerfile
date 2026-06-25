@@ -1,10 +1,10 @@
 # Node Health Watcher — K8s 节点健康巡检系统
 # 部署为 Kubernetes Deployment（长期运行的 scheduler）
-# 镜像构建: docker build -t ghcr.io/290298661-pixel/node-health-watcher:latest .
+# 镜像构建: docker build -t ghcr.io/Shaohan-He/node-health-watcher:latest .
 
 FROM python:3.12-slim
 
-LABEL org.opencontainers.image.source="https://github.com/290298661-pixel/node-health-watcher"
+LABEL org.opencontainers.image.source="https://github.com/Shaohan-He/node-health-watcher"
 LABEL org.opencontainers.image.description="K8s node health inspection & IM alerting toolkit"
 
 ENV PYTHONUNBUFFERED=1 \

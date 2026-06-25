@@ -89,7 +89,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api
-          image: ghcr.io/290298661-pixel/node-health-watcher:latest
+          image: ghcr.io/Shaohan-He/node-health-watcher:latest
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
