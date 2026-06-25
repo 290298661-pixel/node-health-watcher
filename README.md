@@ -57,7 +57,7 @@ Feishu / DingTalk
 ### 安装
 
 ```bash
-git clone https://github.com/290298661-pixel/node-health-watcher.git
+git clone https://github.com/Shaohan-He/node-health-watcher.git
 cd node-health-watcher
 pip install -e .
 ```
@@ -252,7 +252,7 @@ python -m node_health_watcher --interval 5m --state-file ./data/dedup-state.json
 ## 开发
 
 ```bash
-git clone https://github.com/290298661-pixel/node-health-watcher.git
+git clone https://github.com/Shaohan-He/node-health-watcher.git
 cd node-health-watcher
 python -m venv .venv
 . .venv/bin/activate
@@ -279,11 +279,11 @@ pytest tests/ -v --cov=node_health_watcher --cov-report=term-missing
 
 | 仓库 | 关系 |
 | --- | --- |
-| [node-guardian](https://github.com/290298661-pixel/node-guardian) | 节点异常后的人工诊断与维护工具 |
-| [fleet-observability](https://github.com/290298661-pixel/fleet-observability) | 可接入巡检指标、日志和告警 |
-| [fleet-gitops](https://github.com/290298661-pixel/fleet-gitops) | 可管理本服务的部署配置 |
-| [k8s-healing-agent](https://github.com/290298661-pixel/k8s-healing-agent) | 可消费节点告警作为修复输入 |
+| [node-guardian](https://github.com/Shaohan-He/node-guardian) | 节点异常后的人工诊断与维护工具 |
+| [fleet-observability](https://github.com/Shaohan-He/fleet-observability) | 可接入巡检指标、日志和告警 |
+| [fleet-gitops](https://github.com/Shaohan-He/fleet-gitops) | 可管理本服务的部署配置 |
+| [k8s-healing-agent](https://github.com/Shaohan-He/k8s-healing-agent) | 可消费节点告警作为修复输入 |
 
 ## License
 
-MIT © 2026 [Shaohan He](https://github.com/290298661-pixel)
+MIT © 2026 [Shaohan He](https://github.com/Shaohan-He)
